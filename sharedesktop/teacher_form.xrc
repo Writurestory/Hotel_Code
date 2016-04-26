@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxFrame" name="wxmain">
+    <object class="wxStatusBar"/>
+    <object class="wxPanel">
+      <object class="wxBoxSizer">
+        <object class="sizeritem">
+          <object class="wxToggleButton" name="WB_broadcast">
+            <label>broadcast</label>
+          </object>
+          <option>1</option>
+          <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+          <border>0</border>
+        </object>
+        <object class="sizeritem">
+          <object class="wxButton" name="WB_exit">
+            <label>exit</label>
+          </object>
+          <option>1</option>
+          <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+          <border>0</border>
+        </object>
+        <orient>wxHORIZONTAL</orient>
+      </object>
+      <style>wxNO_FULL_REPAINT_ON_RESIZE</style>
+      <exstyle>wxWS_EX_VALIDATE_RECURSIVELY</exstyle>
+    </object>
+    <size>180,56</size>
+    <title>sys</title>
+  </object>
+</resource>

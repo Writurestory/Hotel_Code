@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1">
+  <object class="wxFrame" name="frame1">
+    <object class="wxBoxSizer">
+      <orient>wxHORIZONTAL</orient>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxPanel" name="leftPannel">
+              <size>200,500</size>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxPanel" name="">
+              <object class="wxBoxSizer">
+                <object class="sizeritem">
+                  <object class="wxStaticText" name="label1">
+                    <label>     帐  号  </label>
+                    <wrap>-1</wrap>
+                    <font>
+                      <size>11</size>
+                      <style>normal</style>
+                      <weight>normal</weight>
+                      <underlined>0</underlined>
+                      <family>default</family>
+                      <face>Ubuntu</face>
+                      <encoding>UTF-8</encoding>
+                    </font>
+                    <style>wxALIGN_LEFT</style>
+                  </object>
+                  <option>0</option>
+                  <flag>wxALIGN_CENTRE_VERTICAL</flag>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxTextCtrl" name="txtNum">
+                    <size>180,28</size>
+                    <focused>1</focused>
+                    <style>wxTE_PROCESS_ENTER</style>
+                    <XRCED>
+                      <events>EVT_CHAR</events>
+                      <assign_var>1</assign_var>
+                    </XRCED>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxButton" name="btnFunc">
+                    <label>启用/禁用</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxFlexGridSizer">
+              <hgap>0</hgap>
+              <rows>4</rows>
+              <cols>1</cols>
+              <vgap>0</vgap>
+              <object class="sizeritem">
+                <object class="wxGrid" name="grid_1">
+                  <size>430, 450</size>
+                  <exstyle>wxWS_EX_BLOCK_EVENTS</exstyle>
+                </object>
+                <option>1</option>
+                <flag>wxGROW|wxALIGN_LEFT</flag>
+              </object>
+            </object>
+          </object>
+          <orient>wxVERTICAL</orient>
+        </object>
+      </object>
+      
+      <object class="sizeritem">
+        <object class="wxPanel">
+          <object class="wxBoxSizer">
+            <orient>wxVERTICAL</orient>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>\n点击表格中的帐号\n查看帐号的上网信息\n</label>
+                <style>wxTRANSPARENT_WINDOW</style>
+              </object>
+              <option>3</option>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="userInfo">
+                <fg>#FF0000</fg>
+                <style>wxTRANSPARENT_WINDOW</style>
+              </object>
+              <border>1</border>
+              <minsize>220</minsize>
+            </object>
+          </object>
+          <bg>#ADD8E6</bg>
+        </object>
+      </object>
+    </object>
+    <object class="wxStatusBar" name="statusbar">
+      <fields>3</fields>
+      <widths>-1</widths>
+    </object>
+    <object class="wxToolBar" name="toolbar"/>
+    <title>七天酒店网络管理系统</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE</style>
+  </object>
+</resource>

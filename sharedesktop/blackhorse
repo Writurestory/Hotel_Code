@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#kill  `ps -ax  | grep showDesk.py |cut -d ' ' -f 2`
+RESULT=`pidof python showDesk.py`
+echo $RESULT
+if [ "$RESULT" != "" ]; then #判断RESULT是否为空，为空则说明进程未启动
+	echo $RESULT
+    kill -9 $RESULT
+	sleep 1
+else
+   echo "no student client is running "
+fi
+cd /usr/local/sharedesktop
+python wxscr.py

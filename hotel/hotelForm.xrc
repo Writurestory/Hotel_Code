@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwindows.org/wxxrc">
+  <object class="wxFrame" name="frame1">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxPanel">
+          <object class="wxBoxSizer">
+            <orient>wxHORIZONTAL</orient>
+            <object class="sizeritem">
+              <object class="wxPanel" name="leftPannel"/>
+              <option>0</option>
+              <flag>wxTOP|wxLEFT</flag>
+              <border>1</border>
+              <minsize>200,500</minsize>
+            </object>
+            <object class="sizeritem">
+              <object class="wxBoxSizer">
+                <object class="sizeritem">
+                  <object class="wxBoxSizer">
+                    <object class="sizeritem">
+                      <object class="wxStaticText" name="label1">
+                        <label>  帐 号</label>
+                      </object>
+                      <option>0</option>
+                      <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                      <border>5</border>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxTextCtrl" name="txtNum">
+                        <focused>1</focused>
+                        <style>wxTE_PROCESS_ENTER</style>
+                      </object>
+                      <option>3</option>
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="btnFunc">
+                        <label>启用/禁用</label>
+                      </object>
+                      <option>0</option>
+                      <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                      <border>5</border>
+                    </object>
+                    <orient>wxHORIZONTAL</orient>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="btnAdmin">
+                        <label>开启手工输入</label>
+                      </object>
+                      <option>0</option>
+                      <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                      <border>5</border>
+                    </object>
+                  </object>
+                  <option>0</option>
+                  <flag>wxEXPAND</flag>
+                  <minsize>400,50</minsize>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxGrid" name="grid_1">
+                    <pos>2</pos>
+                    <size>430,450</size>
+                    <style>wxSUNKEN_BORDER</style>
+                  </object>
+                  <option>2</option>
+                  <flag>wxTOP|wxEXPAND</flag>
+                  <border>5</border>
+                  <minsize>430,300</minsize>
+                </object>
+                <orient>wxVERTICAL</orient>
+              </object>
+              <option>0</option>
+              <flag>wxTOP|wxLEFT|wxEXPAND</flag>
+              <border>5</border>
+              <minsize>400,500</minsize>
+            </object>
+            <object class="sizeritem">
+              <option>1</option>
+              <flag>wxEXPAND</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <object class="wxStaticText" name="m_staticText2">
+                    <label>\n点击表格中的帐号\n查看帐号的上网信息\n</label>
+                    <style>wxTRANSPARENT_WINDOW</style>
+                  </object>
+                  <option>0</option>
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <minsize>200,50</minsize>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText" name="userInfo">
+                    <fg>#FF0000</fg>
+                  </object>
+                  <option>2</option>
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                </object>
+              </object>
+            </object>
+          </object>
+          <size>900,530</size>
+        </object>
+        <option>2</option>
+      </object>
+    </object>
+    <object class="wxStatusBar" name="statusbar">
+      <fields>3</fields>
+      <XRCED>
+        <events>EVT_PAINT</events>
+      </XRCED>
+    </object>
+    <title>酒店网络管理系统</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX</style>
+    <exstyle>wxWS_EX_BLOCK_EVENTS</exstyle>
+  </object>
+</resource>

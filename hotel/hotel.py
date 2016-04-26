@@ -1,0 +1,250 @@
+#!/usr/bin/env python
+# -*- coding: utf-8-*-
+import wx
+import  sys
+import random
+from wx import xrc # 导入与XRC处理相关的xrc模块
+from myTable import myTable
+import  wx.grid             as  gridlib
+import ros,myPrint
+import threading,time,myThread
+import myconf
+import readcard
+import winsound
+
+global mutex
+class MyApp(wx.App):
+    #mutex = threading.Lock()  
+    def OnInit(self):
+        
+        self.threads = []
+        self.acu_list=[]  # store online users list
+        self.PWDSTR='qwertyuiopasdfghjklzxcvbnm'
+        self.res=xrc.XmlResource('hotelForm.xrc') # 加载资源文件
+        self.cardPrefix,self.ignore,self.ESSID,self.adminPwd=myconf.getAdminInfo()
+        #self.cardPrefix=myconf.getCardPrefix()
+        #self.ESSID=myconf.getESSID()
+     
+        self.init_frame()
+        return True
+    def __del__(self,destroy):
+        print "ssss destroy-----------"
+    def init_frame(self):
+        self.fm=self.res.LoadFrame(None,'frame1') # 加载Frame，第一个参数为父窗口，当前为顶层窗口，故为None
+        self.icon = wx.Icon('logo.ico', wx.BITMAP_TYPE_ICO)
+        self.fm.SetIcon(self.icon)  
+        self.fm.tbicon=wx.TaskBarIcon()  
+        self.fm.tbicon.SetIcon(self.icon,"NetUM")
+
+        # 获取控件，第一个参数为控件的父窗口
+        # 第二个参数为设计XRC文件时控件的name属性值
+        self.tbar=xrc.XRCCTRL(self.fm,'toolbar')
+        self.tuid=xrc.XRCCTRL(self.fm,'txtNum')
+        self.grid1=xrc.XRCCTRL(self.fm,'grid_1')
+        self.leftpannel=xrc.XRCCTRL(self.fm,'leftPannel')
+        self.userinfo=xrc.XRCCTRL(self.fm,'userInfo')
+        self.grid1.EnableEditing(False)
+        self.tuid.Enable(False)
+        self.grid1.SetSelectionBackground('red')
+        self.statusbar=xrc.XRCCTRL(self.fm,'stausbar')
+        self.fm.SetStatusText(u'网络用户管理系统',0)
+        self.fm.SetStatusText(u'西南林业大学开发',2)
+        self.btnToggle=xrc.XRCCTRL(self.fm,'btnFunc')
+        self.btnAdmin=xrc.XRCCTRL(self.fm,'btnAdmin')
+        self.btnToggle.Enable(False)
+        
+        #绑定按键事件
+        self.Bind(wx.EVT_BUTTON, self.btnAdmin_OnClick, self.btnAdmin)
+        self.Bind(wx.EVT_BUTTON, self.btnToggle_OnClick, self.btnToggle)
+        #self.tuid.Bind(wx.EVT_TEXT_ENTER,self.btnToggle_OnClick)
+        self.Bind(gridlib.EVT_GRID_LABEL_LEFT_CLICK,self.OnSelectUser)
+        self.Bind(gridlib.EVT_GRID_CELL_LEFT_CLICK,self.OnSelectUser)
+        self.fm.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+        self.showPicture()
+        self.showUserInfo()
+        #print self.user_list
+        self.fm.Show()
+        self.roomid=''
+        self.threads.append(myThread.getAusers(self.fm,self))
+        self.threads.append(myThread.chkCard(self.fm,self))
+        self.flag=1
+        for t in self.threads:
+            t.setDaemon(True) # 设置子线程随主线程的结束而结束
+            t.start()
+        
+        #self.chkCardThread_start()
+    def OnCloseWindow(self, event):
+        try:
+            self.flag=0
+            #dlg = wx.MessageDialog(None, u'正在关闭...', u'系统', wx.OK |wx.ICON_ERROR|wx.STAY_ON_TOP)  
+            #result = dlg.ShowModal()
+            
+            for t in self.threads:
+                t.join()      # 阻塞进程直到线程执行完毕
+            #dlg.Destroy()
+            self.fm.Destroy()
+            sys.exit()
+        except Exception,e:
+            print e
+            pass
+
+    def showPicture(self):
+        try:
+            jpg = wx.Image('left.jpg', wx.BITMAP_TYPE_JPEG).ConvertToBitmap()
+            wx.StaticBitmap(self.leftpannel, -1, jpg, (0,0), (jpg.GetWidth(), jpg.GetHeight()))
+        except Exception,e:
+            print e
+          
+    def checkUser(self,_user):
+        _user="".join(_user.split()); 
+        ret=''
+        try:
+            t=int(_user)
+            return _user
+        except:
+            return ''
+        
+        
+        try:
+            if len(_user)==10:
+                #检查卡号的前几位
+                l=len(self.cardPrefix)
+                if _user[0:l]!=self.cardPrefix: return ''
+                t=int(_user[-4:])
+                #ret= "%04x" %t
+                return str(t)
+            elif len(_user)==4:
+                int(_user,16)
+                return _user
+            else:
+                return ''
+        except:
+            return ''
+
+    def OnSelectUser(self,evt):
+        self.current_user=self.user_list[evt.GetRow()][1]
+        #1.查找该用户的当前状态
+        #self.selectedRow=evt.GetRow()
+        self.tuid.SetValue(self.current_user)
+        #显示用户的当前网络状态
+        #print "----------------------------------------"
+        data = ros.activeUserInfo(self.current_user,self.acu_list)
+        str=u'帐号: %s\n' %self.current_user
+        str += u'登陆次数: %d 次 \n\n' % len(data)
+        for d in data:
+            for t in d:
+                if t=='!re': continue
+                ta=t.split('=')
+                #print ta
+                str += "%s: %s\n" %(myconf._(ta[1]),ta[2])
+            str += '\n\n'
+
+        self.userinfo.SetLabel(str)
+        self.grid1.SelectRow(evt.GetRow(),0)
+        #evt.Skip()
+
+    def proc_user(self):
+        #print "enter-----------"
+        #2.修改数据库中的用户状态
+        _user=str(self.tuid.GetValue())
+        if _user == '': return
+        u=self.checkUser(_user)
+        
+        if u == '':
+            dlg = wx.MessageDialog(None, u'你输入的帐号不正确', u'帐号错误', wx.OK |wx.ICON_ERROR|wx.STAY_ON_TOP)  
+            result = dlg.ShowModal()
+            dlg.Destroy()
+            self.tuid.SetValue('')
+            return
+
+        self.current_user=u
+
+        #print "ssss:"+self.current_user
+        newPwd=self.getNewPwd()
+        #判断文本框中的用户是否已经存在
+
+
+        uPosition = -1
+        for i in range(0,len(self.user_list)):
+            if self.user_list[i][1]==self.current_user: 
+                uPosition = i
+                break
+        #print "uPos %d" %uPosition
+
+        if uPosition != -1:
+            #存在,则删除用户,禁止使用
+            userid=self.user_list[uPosition][0]
+            #user=self.user_list[uPosition][1]
+            #ros.delUser(userid,user)
+            #存在则修改密码
+            ros.changePwd(userid,newPwd)
+            winsound.Beep(4000,300)
+        else:
+            #若不存在,添加用户并启用
+            ros.addNewUser(self.current_user,newPwd)
+            winsound.Beep(3000,300)
+        myPrint.send_to_printer(self.ESSID,self.current_user,newPwd) # 打印机打印
+
+        
+        self.showUserInfo()
+        self.grid1.ForceRefresh()
+        self.tuid.SetValue('')
+
+    def btnToggle_OnClick(self,evt):
+        self.proc_user()
+        evt.Skip()
+
+    def btnAdmin_OnClick(self,evt):
+        if self.btnToggle.Enabled==True:
+            self.btnToggle.Enable(False)
+            self.tuid.Enable(False)
+            self.btnAdmin.SetLabel(u'开启手工输入')
+        else:
+            box=wx.PasswordEntryDialog(None,u'请输入管理员密码','密码')
+            if box.ShowModal()==wx.ID_OK:
+                pwd=box.GetValue()
+                if pwd==self.adminPwd:
+                    self.btnToggle.Enable(True)
+                    self.tuid.Enable(True)
+                    self.btnAdmin.SetLabel(u'关闭手工输入')
+                else:
+                    dlg = wx.MessageDialog(None, u'密码错误', u'系统', wx.OK |wx.ICON_ERROR|wx.STAY_ON_TOP)  
+                    result = dlg.ShowModal()
+                    dlg.Destroy()
+            box.Destroy()
+        evt.Skip()
+        
+    def showUserInfo(self):
+        try:
+            self.user_list=ros.getUserList(self.ignore)
+            self.user_blocked_list=[]
+            mytable=myTable(self.user_list)
+            self.grid1.SetTable(mytable,True)
+        except Exception,e:
+            dlg = wx.MessageDialog(None, u'错误号码:'+str(e[0])+'\n\n'+e[1], u'系统', wx.OK |wx.ICON_ERROR|wx.STAY_ON_TOP)  
+            result = dlg.ShowModal()
+            dlg.Destroy()
+            sys.exit()
+
+
+    def getNewPwd(self):
+        lst=list(self.PWDSTR)
+        slice = random.sample(lst, 6)
+        return ''.join(slice)
+
+if __name__ == '__main__':
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+    '''
+       <1>开始自动调用MyApp的父类wx.App对象的__init__()方法
+      <2>之后调用的是MyApp对象的OnInit()方法
+      <3>在OnInit方法中，通常包括了对MyFrame的创建和初始化工作，没错，这个时候开始调用的便是MyFrame的__init__()方法
+    '''
+    app=MyApp() # Automatically calls Oninit() method,and window object can be created
+    
+    '''
+     <4>这一切的初始化结束之后，接下来便要将控制转移给Main控制台，其下来执行的动作便是app.MainLoop()方法
+      <5>接下来便是在主循环的执行，依次来响应各种事件
+      <6>这之后，主循环结束之后，将调用wx.App.OnExit()方法，其对应的便是Application object destroyed阶段.
+    '''
+    app.MainLoop() # above
